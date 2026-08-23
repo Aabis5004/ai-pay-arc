@@ -1,0 +1,83 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { PageHeader } from '@/components/PageHeader';
+import { ChatPanel } from '@/components/ChatPanel';
+import { ArrowLeftRight, Sparkles, Info } from 'lucide-react';
+
+export default function TradingPage() {
+  return (
+    <>
+      <PageHeader
+        title="Seismic AI"
+        subtitle="Ask about Seismic, or tell the agent to deposit, send, and check balances."
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-5 mb-6 backdrop-blur flex items-start gap-3"
+      >
+        <Info className="w-4 h-4 text-violet-400 mt-0.5 shrink-0" />
+        <div className="text-xs text-zinc-300 leading-relaxed">
+          <strong className="text-zinc-100">Seismic AI</strong> can answer questions
+          about Seismic — what it is, how shielded types work, who built it, how much
+          it raised — and it can also act: deposit ETH, send shielded transfers, and
+          check your balance. Just ask in plain English.
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="lg:col-span-2"
+        >
+          <ChatPanel />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="space-y-4"
+        >
+          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 backdrop-blur">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-violet-400" />
+              <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">
+                Try these
+              </div>
+            </div>
+            <div className="space-y-1.5 text-xs text-zinc-300">
+              <div className="font-mono text-violet-300">&quot;What is Seismic?&quot;</div>
+              <div className="font-mono text-violet-300">&quot;How much did Seismic raise?&quot;</div>
+              <div className="font-mono text-violet-300">&quot;How do shielded types work?&quot;</div>
+              <div className="font-mono text-violet-300">&quot;Deposit 2 ETH&quot;</div>
+              <div className="font-mono text-violet-300">&quot;Send 0.5 to 0x70997…&quot;</div>
+              <div className="font-mono text-violet-300">&quot;Check my balance&quot;</div>
+            </div>
+          </div>
+
+          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-5 backdrop-blur">
+            <div className="flex items-center gap-2 mb-3">
+              <ArrowLeftRight className="w-4 h-4 text-zinc-500" />
+              <div className="text-xs uppercase tracking-[0.15em] text-zinc-500">
+                Phase 6 roadmap
+              </div>
+            </div>
+            <ul className="text-xs text-zinc-400 space-y-2 leading-relaxed">
+              <li>· SimpleSwap.sol AMM contract</li>
+              <li>· Two demo SRC20 tokens with shielded balances</li>
+              <li>· Add/remove liquidity flows</li>
+              <li>· Real swap UI replaces this page</li>
+              <li>· AI tools: swap, add_liquidity, get_price</li>
+            </ul>
+          </div>
+        </motion.div>
+      </div>
+    </>
+  );
+}

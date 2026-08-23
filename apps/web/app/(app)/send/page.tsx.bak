@@ -1,0 +1,114 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { getShieldedContract } from 'seismic-viem';
+import { parseEther, type Address, isAddress } from 'viem';
+import { seismicPay } from '@/lib/contract';
+import { NATIVE_SYMBOL } from '@/lib/chain';
+import { useShielded } from '@/lib/useShielded';
+import { waitForTx } from '@/lib/history';
+import { PageHeader } from '@/components/PageHeader';
+import { TxStatusModal, type TxStatus } from '@/components/TxStatusModal';
+import { Send as SendIcon } from 'lucide-react';
+
+export default function SendPage() {
+  const { walletClient, account, ready } = useShielded();
+  const [to, setTo] = useState('');
+  const [amount, setAmount] = useState('');
+  const [status, setStatus] = useState<TxStatus>({ state: 'idle' });
+
+  const valid = isAddress(to) && parseFloat(amount) > 0;
+  const summary = valid ? `${amount} ${NATIVE_SYMBOL} → ${to.slice(0, 8)}…${to.slice(-6)}` : '';
+
+  const submit = async () => {
+    if (!valid || !walletClient || !account) return;
+    setStatus({ state: 'preparing', summary });
+    try {
+      const contract = getShieldedContract({
+        ...seismicPay,
+        client: walletClient,
+      });
+      setStatus({ state: 'signing', summary });
+      const hash = (await (contract as any).write.transfer([
+        to as Address,
+        parseEther(amount),
+      ])) as string;
+      setStatus({ state: 'confirming', summary, hash });
+      await waitForTx(hash as `0x${string}`);
+      setStatus({ state: 'confirmed', summary, hash });
+      setTo('');
+      setAmount('');
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'failed';
+      setStatus({ state: 'failed', summary, error: msg.slice(0, 200) });
+    }
+  };
+
+  return (
+    <>
+      <PageHeader
+        title="Send"
+        subtitle="Shielded transfer to another address. Amount stays private on-chain."
+      />
+
+      <motion.div
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-lg bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 backdrop-blur"
+      >
+        <div className="space-y-5">
+          <div>
+            <label className="text-xs uppercase tracking-[0.15em] text-zinc-500 mb-2 block">
+              Recipient
+            </label>
+            <input
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              placeholder="0x…"
+              className={`w-full bg-zinc-800/60 border ${
+                to && !isAddress(to)
+                  ? 'border-red-800/60'
+                  : 'border-zinc-700'
+              } rounded-lg px-4 py-3 font-mono text-sm focus:outline-none focus:border-violet-500 transition-colors`}
+            />
+            {to && !isAddress(to) && (
+              <div className="text-[11px] text-red-400 mt-1.5">
+                Not a valid 0x-address
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.15em] text-zinc-500 mb-2 block">
+              {`Amount (${NATIVE_SYMBOL})`}
+            </label>
+            <input
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.0"
+              type="number"
+              step="0.0001"
+              className="w-full bg-zinc-800/60 border border-zinc-700 rounded-lg px-4 py-3 text-2xl font-light focus:outline-none focus:border-violet-500 transition-colors"
+            />
+          </div>
+          <motion.button
+            whileHover={{ scale: valid && ready ? 1.01 : 1 }}
+            whileTap={{ scale: valid && ready ? 0.99 : 1 }}
+            disabled={!valid || !ready}
+            onClick={submit}
+            className="w-full py-3 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-500 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <SendIcon className="w-4 h-4" />
+            Send shielded
+          </motion.button>
+        </div>
+      </motion.div>
+
+      <TxStatusModal
+        status={status}
+        onClose={() => setStatus({ state: 'idle' })}
+      />
+    </>
+  );
+}

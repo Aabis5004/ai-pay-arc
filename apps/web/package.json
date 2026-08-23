@@ -1,0 +1,37 @@
+{
+  "name": "web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.46",
+    "@google/genai": "^2.8.0",
+    "@privy-io/react-auth": "^3.29.2",
+    "@privy-io/wagmi": "^4.0.11",
+    "@tanstack/react-query": "^5.101.0",
+    "ai": "^7.0.77",
+    "framer-motion": "^12.40.0",
+    "lucide-react": "^1.17.0",
+    "next": "16.2.7",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "seismic-react": "^2.0.1",
+    "seismic-viem": "^2.0.1",
+    "viem": "^2.52.2",
+    "wagmi": "^2.19.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

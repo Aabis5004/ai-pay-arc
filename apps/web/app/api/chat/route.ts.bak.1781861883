@@ -1,0 +1,88 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenAI, Type } from '@google/genai';
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
+const tools = [
+  {
+    functionDeclarations: [
+      {
+        name: 'get_balance',
+        description:
+          "Get the user's own shielded balance. Use whenever they ask about balance, how much they have, etc.",
+        parameters: { type: Type.OBJECT, properties: {} },
+      },
+      {
+        name: 'send_payment',
+        description:
+          'Propose a shielded transfer. User confirms before execution.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            to: { type: Type.STRING, description: 'Recipient 0x-address' },
+            amount: { type: Type.STRING, description: 'Amount in native units (SIZE on testnet) as a decimal string' },
+          },
+          required: ['to', 'amount'],
+        },
+      },
+      {
+        name: 'deposit',
+        description: "Deposit native ETH into the shielded vault.",
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            amount: { type: Type.STRING, description: 'Amount in native units (SIZE on testnet) as a decimal string' },
+          },
+          required: ['amount'],
+        },
+      },
+      {
+        name: 'get_history',
+        description:
+          "Get the user's recent on-chain activity (deposits, sends, receives). Returns count + summary.",
+        parameters: { type: Type.OBJECT, properties: {} },
+      },
+      {
+        name: 'get_portfolio',
+        description:
+          "Get the user's portfolio: shielded balance + transaction counts.",
+        parameters: { type: Type.OBJECT, properties: {} },
+      },
+    ],
+  },
+];
+
+const systemInstruction = `You are the agent for AI Pay Seismic — a shielded payments app on the Seismic blockchain.
+
+Rules:
+- Never see actual balance or amounts; they're encrypted on-chain. Use tools.
+- For send/deposit, always call the tool — user confirms before signing.
+- Be concise — two sentences max unless asked for detail.
+- Never invent transaction hashes, addresses, or balances. Only report tool results.`;
+
+export async function POST(req: NextRequest) {
+  try {
+    const { messages } = await req.json();
+    const contents = messages.map((m: { role: string; content: string }) => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }],
+    }));
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents,
+      config: { tools, systemInstruction },
+    });
+
+    return NextResponse.json({
+      text: response.text || '',
+      functionCalls: (response.functionCalls || []).map((fc) => ({
+        name: fc.name,
+        args: fc.args,
+      })),
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'unknown error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
