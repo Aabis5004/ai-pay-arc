@@ -68,7 +68,9 @@ export function BalanceCard() {
             ) : hidden ? (
               <div className="text-4xl font-light text-white/60 tracking-wider">••••</div>
             ) : (
-              <NumberCounter value={balances.walletUsdc} className="text-4xl font-light text-white tracking-tight" decimals={2} />
+              <div className="text-4xl font-light text-white tracking-tight">
+                <NumberCounter value={balances.walletUsdc} decimals={2} />
+              </div>
             )}
             <div className="text-sm text-white/40 font-light">USDC (Wallet)</div>
           </div>
@@ -82,7 +84,9 @@ export function BalanceCard() {
             ) : hidden ? (
               <div className="text-2xl font-light text-white/60 tracking-wider">••••</div>
             ) : (
-              <NumberCounter value={balances.usdc} className="text-2xl font-light text-white/80 tracking-tight" decimals={2} />
+              <div className="text-2xl font-light text-white/80 tracking-tight">
+                <NumberCounter value={balances.usdc} decimals={2} />
+              </div>
             )}
             <div className="text-xs text-white/40 font-light">USDC (ArcPay Vault)</div>
           </div>
