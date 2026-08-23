@@ -57,7 +57,7 @@ export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
         fromBlock,
       });
       for (const e of evts) {
-        const args = e.args as any;
+        const args = (e as any).args;
         events.push({
           type: q.type,
           txHash: e.transactionHash!,

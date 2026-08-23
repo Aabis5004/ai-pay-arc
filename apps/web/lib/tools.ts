@@ -26,8 +26,8 @@ export async function executeTool(
   try {
     switch (tc.name) {
       case 'get_balance': {
-        const { usdc, eth } = await calculateBalances(account.address as Address);
-        return { ok: true, data: `USDC: ${formatEther(usdc)}, ETH: ${formatEther(eth)}` };
+        const { usdc, walletUsdc } = await calculateBalances(account.address as Address);
+        return { ok: true, data: `USDC (Vault): ${formatEther(usdc)}, USDC (Wallet): ${formatEther(walletUsdc)}` };
       }
       case 'deposit': {
         const amount = parseEther(String(tc.args.amount));
@@ -66,11 +66,11 @@ export async function executeTool(
         };
       }
       case 'get_portfolio': {
-        const { usdc, eth } = await calculateBalances(account.address as Address);
+        const { usdc, walletUsdc } = await calculateBalances(account.address as Address);
         const events = await fetchHistory(account.address as Address);
         return {
           ok: true,
-          data: `USDC: ${formatEther(usdc)}, ETH: ${formatEther(eth)} · ${events.length} on-chain events.`,
+          data: `USDC (Vault): ${formatEther(usdc)}, USDC (Wallet): ${formatEther(walletUsdc)} · ${events.length} on-chain events.`,
         };
       }
       default:
