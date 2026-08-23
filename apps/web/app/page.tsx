@@ -9,8 +9,8 @@ import { Shield, Sparkles, Lock, Zap } from 'lucide-react';
 const features = [
   {
     icon: Shield,
-    title: 'Shielded by default',
-    body: 'Balances and amounts stay encrypted on-chain via Arc Pay contracts.',
+    title: 'Secure by default',
+    body: 'Balances and amounts are securely managed on-chain via Arc Pay contracts.',
   },
   {
     icon: Sparkles,
@@ -68,13 +68,13 @@ export default function Home() {
             Built on Arc
           </div>
           <h1 className="text-6xl md:text-7xl tracking-tight leading-[1.05] mb-6">
-            Shielded payments,
+            Smart payments,
             <br />
             <span className="font-display italic text-violet-300">spoken plainly.</span>
           </h1>
           <p className="text-lg text-zinc-400 max-w-xl mx-auto mb-10 leading-relaxed">
             Tell the agent what to do. Send, deposit, check balances — all
-            encrypted, all on-chain, all without leaving the conversation.
+            secure, all on-chain, all without leaving the conversation.
           </p>
           <motion.button
             whileHover={{ scale: 1.03 }}

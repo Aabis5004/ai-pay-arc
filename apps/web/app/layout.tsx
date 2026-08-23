@@ -21,7 +21,7 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'AI Pay Arc',
-  description: 'Shielded payments with natural language',
+  description: 'Smart payments with natural language',
 };
 
 export default function RootLayout({
