@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from 'react';
 export function NumberCounter({
   value,
   decimals = 4,
+  className,
 }: {
   value: number;
   decimals?: number;
+  className?: string;
 }) {
   const [display, setDisplay] = useState(value);
   const prevRef = useRef(value);
@@ -30,5 +32,5 @@ export function NumberCounter({
     return () => cancelAnimationFrame(raf);
   }, [value]);
 
-  return <span>{display.toFixed(decimals)}</span>;
+  return <span className={className}>{display.toFixed(decimals)}</span>;
 }
