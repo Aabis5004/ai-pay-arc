@@ -83,7 +83,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 className="text-violet-400"
                 style={{ fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}
               >
-                Seismic
+                Arc
               </span>
             </h1>
           </div>

@@ -20,7 +20,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Pay Seismic',
+  title: 'AI Pay Arc',
   description: 'Shielded payments with natural language',
 };
 

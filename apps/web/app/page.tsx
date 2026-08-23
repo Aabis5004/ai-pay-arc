@@ -10,7 +10,7 @@ const features = [
   {
     icon: Shield,
     title: 'Shielded by default',
-    body: 'Balances and amounts stay encrypted on-chain via Seismic TEE.',
+    body: 'Balances and amounts stay encrypted on-chain via Arc Pay contracts.',
   },
   {
     icon: Sparkles,
@@ -25,7 +25,7 @@ const features = [
   {
     icon: Zap,
     title: 'Sub-second finality',
-    body: 'Built on Seismic for fast settlement.',
+    body: 'Built on Arc Testnet for fast settlement.',
   },
 ];
 
@@ -63,9 +63,9 @@ export default function Home() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 bg-violet-950/40 border border-violet-900/50 rounded-full text-xs text-violet-300">
-            <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
-            Built on Seismic
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/60 mb-8">
+            <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+            Built on Arc
           </div>
           <h1 className="text-6xl md:text-7xl tracking-tight leading-[1.05] mb-6">
             Shielded payments,
