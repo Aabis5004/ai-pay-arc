@@ -19,8 +19,9 @@ function getClient(): PublicClient {
   });
 }
 
+const blockCache = new Map<bigint, number>();
+
 export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
-  const events: HistoryEvent[] = [];
   const client = getClient();
   const contract = arcPay;
   
@@ -34,7 +35,6 @@ export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
   let fromBlock = 0n;
   try {
     const latest = await client.getBlockNumber();
-    // Fetch last 99k blocks to stay under RPC 100k limit
     fromBlock = latest > 99000n ? latest - 99000n : 0n;
   } catch (e) {
     console.warn('Failed to get block number', e);
@@ -47,47 +47,56 @@ export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
     { name: 'Withdrawn' as const, args: { user }, type: 'withdraw' as const },
   ];
 
-  for (const q of queries) {
-    try {
-      const evts = await client.getContractEvents({
-        address: contract.address as Address,
-        abi: contract.abi,
-        eventName: q.name,
-        args: q.args,
-        fromBlock,
-      });
-      for (const e of evts) {
-        const args = (e as any).args;
-        events.push({
-          type: q.type,
-          txHash: e.transactionHash!,
-          blockNumber: e.blockNumber!,
-          token: args.token,
-          amount: args.amount,
-          counterparty:
-            q.type === 'send' ? args.to : q.type === 'receive' ? args.from : undefined,
-        });
-      }
-    } catch (e) {
-      console.warn('[history]', e);
-    }
-  }
-
-  events.sort((a, b) => Number(b.blockNumber - a.blockNumber));
-
-  const top = events.slice(0, 60);
-  await Promise.all(
-    top.map(async (ev) => {
+  const results = await Promise.all(
+    queries.map(async (q) => {
       try {
-        const block = await client.getBlock({ blockNumber: ev.blockNumber });
-        ev.timestamp = Number(block.timestamp) * 1000;
-      } catch {
-        /* ignore */
+        const evts = await client.getContractEvents({
+          address: contract.address as Address,
+          abi: contract.abi,
+          eventName: q.name,
+          args: q.args as any,
+          fromBlock,
+        });
+        return evts.map((e) => {
+          const args = (e as any).args;
+          return {
+            type: q.type,
+            txHash: e.transactionHash!,
+            blockNumber: e.blockNumber!,
+            token: args.token,
+            amount: args.amount,
+            counterparty: q.type === 'send' ? args.to : q.type === 'receive' ? args.from : undefined,
+          } as HistoryEvent;
+        });
+      } catch (e) {
+        console.warn(`[history] error for ${q.type}`, e);
+        return [];
       }
     }),
   );
 
-  return events;
+  const events = results.flat();
+  events.sort((a, b) => Number(b.blockNumber - a.blockNumber));
+
+  const top = events.slice(0, 60);
+  const uniqueBlocks = Array.from(new Set(top.map((e) => e.blockNumber)));
+  
+  await Promise.all(
+    uniqueBlocks.map(async (num) => {
+      if (!blockCache.has(num)) {
+        try {
+          const block = await client.getBlock({ blockNumber: num });
+          blockCache.set(num, Number(block.timestamp) * 1000);
+        } catch { /* ignore */ }
+      }
+    })
+  );
+
+  for (const ev of top) {
+    ev.timestamp = blockCache.get(ev.blockNumber);
+  }
+
+  return top;
 }
 
 export async function waitForTx(hash: Hash) {
