@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useState } from 'react';
-import { useShielded } from '@/lib/useShielded';
+import { useWalletAddress } from '@/lib/useWalletAddress';
 import { fetchHistory, type HistoryEvent } from '@/lib/history';
 import { explorerTxUrl } from '@/lib/explorer';
 import { PageHeader } from '@/components/PageHeader';
@@ -32,7 +32,7 @@ function truncate(addr: string | undefined, chars = 4) {
 }
 
 export default function HistoryPage() {
-  const { address } = useShielded();
+  const address = useWalletAddress();
   const [events, setEvents] = useState<HistoryEvent[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
