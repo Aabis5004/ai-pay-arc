@@ -5,7 +5,7 @@ export const arcDocsContext = `Background facts about Arc (use these to answer u
 - The platform uses App Kit for bridging, swaps, and unified balance capabilities. Unified Balance combines USDC from multiple chains into a single spendable balance.
 - Arc is currently available on Testnet only. You can get testnet tokens from the Circle Faucet.
 - Use cases: global payments, exchanges, lending, scalable finance.
-- "AI Pay Arc" (this app) is a payments demo: deposit native USDC into a vault, send instant transfers on the Arc Testnet.
+- "FlowPay" (this app) is a payments demo: deposit native USDC into a vault, send instant transfers on the Arc Testnet.
 - Opt-in Privacy: APS uses a single master secret key (MSK) distributed across validators through Shamir threshold secret sharing. The MSK can only be reconstructed inside attested enclaves and is never exposed to validator hosts. All derived keys for transaction decryption, per-contract state encryption, and state root encryption come from the MSK.
 
 About Arc House & Community:

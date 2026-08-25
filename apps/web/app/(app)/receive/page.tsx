@@ -26,7 +26,7 @@ export default function ReceivePage() {
     if (typeof navigator !== 'undefined' && (navigator as Navigator & { share?: (data: ShareData) => Promise<void> }).share) {
       try {
         await (navigator as Navigator & { share: (data: ShareData) => Promise<void> }).share({
-          title: 'My AI Pay Arc address',
+          title: 'My FlowPay address',
           text: `Send me USDC on Arc Testnet: ${address}`,
         });
       } catch {

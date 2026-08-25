@@ -20,7 +20,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Pay Arc',
+  title: 'FlowPay',
   description: 'Smart payments with natural language',
 };
 

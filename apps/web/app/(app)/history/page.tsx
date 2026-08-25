@@ -94,7 +94,7 @@ export default function HistoryPage() {
         {loading && !events ? (
           <div className="p-6 space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-16 shimmer rounded-xl" />
+              <div key={i} className="h-16 animate-pulse bg-zinc-800/50 rounded-xl" />
             ))}
           </div>
         ) : error ? (
@@ -122,26 +122,60 @@ export default function HistoryPage() {
               let fromAddress = '';
               let toAddress = '';
               let actionType = '';
+              let primaryText = '';
               
               if (ev.type === 'deposit') {
                 fromAddress = address || '';
                 toAddress = 'ArcPay Contract';
                 actionType = 'Deposit';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
               } else if (ev.type === 'withdraw') {
                 fromAddress = 'ArcPay Contract';
                 toAddress = address || '';
                 actionType = 'Withdraw';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
               } else if (ev.type === 'send') {
                 fromAddress = address || '';
                 toAddress = ev.counterparty || '';
                 actionType = 'Send';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
               } else if (ev.type === 'receive') {
                 fromAddress = ev.counterparty || '';
                 toAddress = address || '';
                 actionType = 'Receive';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
+              } else if (ev.type === 'stake') {
+                fromAddress = address || '';
+                toAddress = 'Staking Vault';
+                actionType = 'Stake';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} Token`;
+              } else if (ev.type === 'unstake') {
+                fromAddress = 'Staking Vault';
+                toAddress = address || '';
+                actionType = 'Unstake';
+                primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} Token`;
+              } else if (ev.type === 'swap') {
+                fromAddress = address || '';
+                toAddress = 'AMM Router';
+                actionType = 'Swap';
+                const amtIn = ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0';
+                const amtOut = ev.amountB ? parseFloat(formatEther(ev.amountB)).toString() : '0';
+                primaryText = `${amtIn} -> ${amtOut}`;
+              } else if (ev.type === 'add_liquidity') {
+                fromAddress = address || '';
+                toAddress = 'Liquidity Pool';
+                actionType = 'Add Liquidity';
+                const amtA = ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0';
+                const amtB = ev.amountB ? parseFloat(formatEther(ev.amountB)).toString() : '0';
+                primaryText = `${amtA} & ${amtB}`;
+              } else if (ev.type === 'remove_liquidity') {
+                fromAddress = 'Liquidity Pool';
+                toAddress = address || '';
+                actionType = 'Remove Liquidity';
+                const amtA = ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0';
+                const amtB = ev.amountB ? parseFloat(formatEther(ev.amountB)).toString() : '0';
+                primaryText = `${amtA} & ${amtB}`;
               }
-
-              const formattedAmount = ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0';
 
               return (
                 <motion.div
@@ -158,7 +192,7 @@ export default function HistoryPage() {
                       <div className="w-5 h-5 rounded-full bg-sky-500/20 flex items-center justify-center border border-sky-500/30">
                         <span className="text-[9px] font-bold text-sky-400">$</span>
                       </div>
-                      <span className="font-semibold text-zinc-200 text-sm">{formattedAmount} USDC</span>
+                      <span className="font-semibold text-zinc-200 text-sm truncate max-w-[150px]">{primaryText}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
                       <span>Sender: {truncate(fromAddress)}</span>

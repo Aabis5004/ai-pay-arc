@@ -101,7 +101,7 @@ export default function CardPage() {
           <div className="text-sm text-zinc-500 py-6 text-center">No activity yet. Deposit to your card to get started.</div>
         ) : (
           <div className="space-y-2">
-            {events.slice(0, 6).map((e, i) => (
+            {events.filter(e => ['deposit', 'withdraw', 'send', 'receive'].includes(e.type)).slice(0, 6).map((e, i) => (
               <motion.div key={`${e.txHash}-${i}`} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
                 className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-zinc-800/40 transition-colors">
                 <div className="flex items-center gap-3">

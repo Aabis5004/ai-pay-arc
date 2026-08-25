@@ -47,9 +47,9 @@ export function ToolConfirmation({
 
   const summary = (() => {
     if (call.name === 'send_payment')
-      return `Send ${call.args.amount} ETH to ${String(call.args.to).slice(0, 8)}…`;
+      return `Send ${call.args.amount} USDC to ${String(call.args.to).slice(0, 8)}…`;
     if (call.name === 'deposit')
-      return `Deposit ${call.args.amount} ETH to shielded vault`;
+      return `Deposit ${call.args.amount} USDC to shielded vault`;
     if (call.name === 'get_balance') return 'Reading shielded balance';
     return call.name;
   })();

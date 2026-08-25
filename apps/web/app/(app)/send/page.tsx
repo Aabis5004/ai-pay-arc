@@ -17,10 +17,12 @@ import { arcPay, testEth } from '@/lib/contract';
 import { arcTestnet } from '@/lib/chain';
 import { useWalletAddress } from '@/lib/useWalletAddress';
 import { calculateBalances } from '@/lib/balance';
-import { formatEther } from 'viem';
+import { formatEther, formatUnits, parseUnits } from 'viem';
 import { PageHeader } from '@/components/PageHeader';
 import { resolveCard } from '@/lib/cardRegistry';
-
+import { useReadContract } from 'wagmi';
+import { parseAbi } from 'viem';
+import { MOCK_TOKENS } from '@/lib/tokens';
 type SendState =
   | { kind: 'idle' }
   | { kind: 'preparing' }
@@ -37,13 +39,15 @@ export default function SendPage() {
   const [amount, setAmount] = useState('');
   const [tokenType, setTokenType] = useState<'USDC' | 'ETH'>('USDC');
   const [state, setState] = useState<SendState>({ kind: 'idle' });
-  const [vaultBalance, setVaultBalance] = useState('0');
+  const { data: vaultBalanceWei } = useReadContract({
+    address: arcPay.address as Address,
+    abi: parseAbi(['function vaultBalance(address user, address token) external view returns (uint256)']),
+    functionName: 'vaultBalance',
+    args: address ? [address as `0x${string}`, MOCK_TOKENS[0].address as `0x${string}`] : undefined,
+    query: { enabled: !!address },
+  });
 
-  useEffect(() => {
-    if (address) {
-      calculateBalances(address as Address).then(bals => setVaultBalance(formatEther(bals.usdc)));
-    }
-  }, [address]);
+  const vaultBalance = vaultBalanceWei ? formatUnits(vaultBalanceWei, 6) : '0';
 
   const activeChain = arcTestnet;
   const tokenSymbol = tokenType;
@@ -95,7 +99,7 @@ export default function SendPage() {
     
     let amountWei: bigint;
     try {
-      amountWei = parseEther(amount);
+      amountWei = tokenType === 'USDC' ? parseUnits(amount, 6) : parseEther(amount);
     } catch {
       setState({ kind: 'error', message: 'Amount is invalid.' });
       return;
@@ -169,7 +173,7 @@ export default function SendPage() {
 
     let hash: `0x${string}`;
     try {
-      const tokenAddress = tokenType === 'USDC' ? zeroAddress : testEth.address;
+      const tokenAddress = tokenType === 'USDC' ? (MOCK_TOKENS[0].address as Address) : testEth.address;
       hash = await walletClient.writeContract({
         address: arcPay.address as Address,
         abi: arcPay.abi,

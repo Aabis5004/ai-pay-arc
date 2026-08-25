@@ -16,6 +16,9 @@ import {
   LogOut,
   Sparkles,
   CreditCard,
+  ArrowRightLeft,
+  Droplets,
+  Coins,
 } from 'lucide-react';
 
 const nav = [
@@ -23,6 +26,9 @@ const nav = [
   { href: '/send', label: 'Send', icon: Send },
   { href: '/deposit', label: 'Deposit', icon: ArrowDownToLine },
   { href: '/receive', label: 'Receive', icon: QrCode },
+  { href: '/swap', label: 'Swap', icon: ArrowRightLeft },
+  { href: '/liquidity', label: 'Liquidity', icon: Droplets },
+  { href: '/stake', label: 'Stake', icon: Coins },
   { href: '/history', label: 'Activity', icon: Clock },
   { href: '/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/card', label: 'Card', icon: CreditCard },
@@ -41,12 +47,12 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <div className="mb-8">
         <Link href="/dashboard" className="block" onClick={onNavigate}>
           <h1 className="text-lg tracking-tight">
-            AI Pay{' '}
+            Flow{' '}
             <span
               className="text-sky-400"
               style={{ fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}
             >
-              Arc
+              Pay
             </span>
           </h1>
           <div className="text-[10px] uppercase tracking-[0.2em] text-zinc-600 mt-1">

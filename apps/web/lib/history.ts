@@ -1,14 +1,17 @@
-import { createPublicClient, http, type Address, type Hash, type PublicClient, getAddress } from 'viem';
-import { arcPay } from './contract';
+import { createPublicClient, http, type Address, type Hash, type PublicClient, getAddress, parseAbi, decodeEventLog, pad } from 'viem';
+import { ARC_PAY_ADDRESS } from './contract';
 import { arcTestnet } from './chain';
+import { MOCK_TOKENS } from './tokens';
 
 export type HistoryEvent = {
-  type: 'deposit' | 'send' | 'receive' | 'withdraw';
+  type: 'deposit' | 'send' | 'receive' | 'withdraw' | 'swap' | 'stake' | 'unstake' | 'add_liquidity' | 'remove_liquidity';
   txHash: Hash;
   blockNumber: bigint;
   counterparty?: Address;
   token?: Address;
+  tokenB?: Address;
   amount?: bigint;
+  amountB?: bigint;
   timestamp?: number;
 };
 
@@ -19,12 +22,19 @@ function getClient(): PublicClient {
   });
 }
 
-const blockCache = new Map<bigint, number>();
+
+
+const historyAbi = parseAbi([
+  'event Deposited(address indexed user, address indexed token, uint256 amount)',
+  'event Staked(address indexed user, address indexed token, uint256 amount)',
+  'event Unstaked(address indexed user, address indexed token, uint256 amount)',
+  'event LiquidityAdded(address indexed user, address tokenA, address tokenB, uint256 amountA, uint256 amountB)',
+  'event LiquidityRemoved(address indexed user, address tokenA, address tokenB, uint256 amountA, uint256 amountB)',
+  'event Swapped(address indexed user, address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut)',
+  'event Transferred(address indexed from, address indexed to, address indexed token, uint256 amount)'
+]);
 
 export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
-  const client = getClient();
-  const contract = arcPay;
-  
   let user: Address;
   try {
     user = getAddress(rawUser);
@@ -32,71 +42,70 @@ export async function fetchHistory(rawUser: Address): Promise<HistoryEvent[]> {
     return [];
   }
 
-  let fromBlock = 0n;
-  try {
-    const latest = await client.getBlockNumber();
-    fromBlock = latest > 99000n ? latest - 99000n : 0n;
-  } catch (e) {
-    console.warn('Failed to get block number', e);
-  }
-
-  const queries = [
-    { name: 'Deposited' as const, args: { user }, type: 'deposit' as const },
-    { name: 'Transferred' as const, args: { from: user }, type: 'send' as const },
-    { name: 'Transferred' as const, args: { to: user }, type: 'receive' as const },
-    { name: 'Withdrawn' as const, args: { user }, type: 'withdraw' as const },
-  ];
-
-  const results = await Promise.all(
-    queries.map(async (q) => {
-      try {
-        const evts = await client.getContractEvents({
-          address: contract.address as Address,
-          abi: contract.abi,
-          eventName: q.name,
-          args: q.args as any,
-          fromBlock,
-        });
-        return evts.map((e) => {
-          const args = (e as any).args;
-          return {
-            type: q.type,
-            txHash: e.transactionHash!,
-            blockNumber: e.blockNumber!,
-            token: args.token,
-            amount: args.amount,
-            counterparty: q.type === 'send' ? args.to : q.type === 'receive' ? args.from : undefined,
-          } as HistoryEvent;
-        });
-      } catch (e) {
-        console.warn(`[history] error for ${q.type}`, e);
-        return [];
-      }
-    }),
-  );
-
-  const events = results.flat();
-  events.sort((a, b) => Number(b.blockNumber - a.blockNumber));
-
-  const top = events.slice(0, 60);
-  const uniqueBlocks = Array.from(new Set(top.map((e) => e.blockNumber)));
+  const topic1 = pad(user, { size: 32 }).toLowerCase();
+  const url = `https://testnet.arcscan.app/api?module=logs&action=getLogs&fromBlock=58513500&toBlock=latest&address=${ARC_PAY_ADDRESS}&topic1=${topic1}`;
   
-  await Promise.all(
-    uniqueBlocks.map(async (num) => {
-      if (!blockCache.has(num)) {
-        try {
-          const block = await client.getBlock({ blockNumber: num });
-          blockCache.set(num, Number(block.timestamp) * 1000);
-        } catch { /* ignore */ }
-      }
-    })
-  );
-
-  for (const ev of top) {
-    ev.timestamp = blockCache.get(ev.blockNumber);
+  let logs: any[] = [];
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.status === '1' && Array.isArray(data.result)) {
+      logs = data.result;
+    } else if (data.result && Array.isArray(data.result)) {
+      logs = data.result;
+    }
+  } catch(e) {
+    console.warn("Failed to fetch logs from explorer", e);
+    return [];
   }
 
-  return top;
+  const events: HistoryEvent[] = [];
+  
+  for (const log of logs) {
+    try {
+      const decoded = decodeEventLog({
+        abi: historyAbi,
+        data: log.data,
+        topics: log.topics,
+      });
+
+      const args = decoded.args as any;
+      let token = args.token || args.tokenIn || args.tokenA;
+      let tokenB = args.tokenOut || args.tokenB;
+      let amount = args.amount || args.amountIn || args.amountA;
+      let amountB = args.amountOut || args.amountB;
+
+      let type = '';
+      if (decoded.eventName === 'Deposited') type = 'deposit';
+      else if (decoded.eventName === 'Staked') type = 'stake';
+      else if (decoded.eventName === 'Unstaked') type = 'unstake';
+      else if (decoded.eventName === 'Swapped') type = 'swap';
+      else if (decoded.eventName === 'LiquidityAdded') type = 'add_liquidity';
+      else if (decoded.eventName === 'LiquidityRemoved') type = 'remove_liquidity';
+      else if (decoded.eventName === 'Transferred') {
+        if (args.from.toLowerCase() === user.toLowerCase()) type = 'send';
+        else if (args.to.toLowerCase() === user.toLowerCase()) type = 'receive';
+      }
+
+      if (type) {
+        events.push({
+          type: type as any,
+          txHash: log.transactionHash,
+          blockNumber: BigInt(log.blockNumber),
+          token,
+          tokenB,
+          amount,
+          amountB,
+          timestamp: log.timeStamp ? parseInt(log.timeStamp, 16) * 1000 : undefined
+        });
+      }
+    } catch(e) {
+      // ignore decoding errors for unknown events
+    }
+  }
+
+  events.sort((a, b) => Number(b.blockNumber - a.blockNumber));
+  return events.slice(0, 60);
 }
 
 export async function waitForTx(hash: Hash) {

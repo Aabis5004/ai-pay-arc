@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #f5f5f7;
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 html, body {
@@ -23,14 +23,24 @@ body {
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.4);
+  background: rgba(124, 58, 237, 0.2);
+}
+
+/* Hide number input spin buttons globally */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
 }
 
 /* subtle ambient grid background */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
@@ -40,7 +50,7 @@ body {
   100% { background-position: 400px 0; }
 }
 .shimmer {
-  background: linear-gradient(90deg, #1f1f27 0px, #2a2a35 200px, #1f1f27 400px);
+  background: linear-gradient(90deg, #18181b 0px, #27272a 200px, #18181b 400px);
   background-size: 800px 100%;
   animation: shimmer 1.4s linear infinite;
 }

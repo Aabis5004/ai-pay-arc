@@ -1,8 +1,9 @@
 'use client';
 
-import { createPublicClient, http, type Address, zeroAddress } from 'viem';
+import { createPublicClient, http, parseAbi, type Address } from 'viem';
 import { arcPay } from './contract';
 import { arcTestnet } from './chain';
+import { MOCK_TOKENS } from './tokens';
 
 export async function calculateBalances(userAddress: Address): Promise<{ walletUsdc: bigint; usdc: bigint }> {
   if (!userAddress) return { walletUsdc: 0n, usdc: 0n };
@@ -12,14 +13,16 @@ export async function calculateBalances(userAddress: Address): Promise<{ walletU
     transport: http(arcTestnet.rpcUrls.default.http[0]),
   });
 
+  const usdcTokenAddress = MOCK_TOKENS[0].address as Address; // USDC
+
   try {
     const [walletUsdc, usdc] = await Promise.all([
       client.getBalance({ address: userAddress }),
       client.readContract({
         address: arcPay.address as Address,
-        abi: arcPay.abi,
-        functionName: 'balanceOf',
-        args: [userAddress, zeroAddress],
+        abi: parseAbi(['function vaultBalance(address user, address token) external view returns (uint256)']),
+        functionName: 'vaultBalance',
+        args: [userAddress, usdcTokenAddress],
       }) as Promise<bigint>,
     ]);
     return { walletUsdc, usdc };

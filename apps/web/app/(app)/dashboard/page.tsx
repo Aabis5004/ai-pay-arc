@@ -18,6 +18,11 @@ import {
   ArrowUpRight,
   ArrowUpFromLine,
   ExternalLink,
+  RefreshCcw,
+  Lock,
+  Unlock,
+  Droplets,
+  MinusCircle
 } from 'lucide-react';
 
 const quick = [
@@ -27,17 +32,53 @@ const quick = [
   { href: '/history', icon: Clock, label: 'Activity', hint: 'Recent events' },
 ];
 
-const iconMap = {
+const iconMap: Record<string, any> = {
   deposit: ArrowDownToLine,
   withdraw: ArrowUpFromLine,
   send: ArrowUpRight,
   receive: ArrowDownLeft,
+  swap: RefreshCcw,
+  stake: Lock,
+  unstake: Unlock,
+  add_liquidity: Droplets,
+  remove_liquidity: MinusCircle,
 };
 
+import { useReadContract } from 'wagmi';
+import { erc20Abi, formatUnits } from 'viem';
+import { MOCK_TOKENS } from '@/lib/tokens';
+import { ARC_PAY_ADDRESS } from '@/lib/contract';
+import { parseAbi } from 'viem';
+
+const arcDeFiAbi = parseAbi([
+  'function vaultBalance(address user, address token) external view returns (uint256)'
+]);
+
 export default function Dashboard() {
-  const { address } = useShielded();
+  const { account, address } = useShielded();
 
   const [recent, setRecent] = useState<HistoryEvent[]>([]);
+
+  const usdc = MOCK_TOKENS[0];
+
+  const { data: walletBal } = useReadContract({
+    address: usdc.address as `0x${string}`,
+    abi: erc20Abi,
+    functionName: 'balanceOf',
+    args: account ? [account.address as `0x${string}`] : undefined,
+    query: { enabled: !!account && !!usdc.address.startsWith('0x') },
+  });
+
+  const { data: vaultBal } = useReadContract({
+    address: ARC_PAY_ADDRESS,
+    abi: arcDeFiAbi,
+    functionName: 'vaultBalance',
+    args: account ? [account.address as `0x${string}`, usdc.address as `0x${string}`] : undefined,
+    query: { enabled: !!account && !!usdc.address.startsWith('0x') },
+  });
+
+  const displayWallet = walletBal !== undefined ? Number(formatUnits(walletBal, usdc.decimals)).toFixed(2) : '0.00';
+  const displayVault = vaultBal !== undefined ? Number(formatUnits(vaultBal, usdc.decimals)).toFixed(2) : '0.00';
 
   useEffect(() => {
     if (!address) return;
@@ -54,7 +95,23 @@ export default function Dashboard() {
     <>
       <PageHeader title="Dashboard" subtitle="Welcome back." />
 
-      <BalanceCard />
+      <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 backdrop-blur">
+        <div className="text-xs uppercase tracking-widest text-sky-400 font-semibold mb-6">
+          Arc Testnet Balances
+        </div>
+        <div className="space-y-6">
+          <div>
+            <div className="text-4xl font-light text-white flex items-baseline gap-2">
+              {displayWallet} <span className="text-sm text-zinc-500 font-medium">USDC (Wallet)</span>
+            </div>
+          </div>
+          <div>
+            <div className="text-4xl font-light text-white flex items-baseline gap-2">
+              {displayVault} <span className="text-sm text-zinc-500 font-medium">USDC (Vault)</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <motion.div
         initial="hidden"

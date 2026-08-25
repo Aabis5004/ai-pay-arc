@@ -1,8 +1,9 @@
-import { parseEther, formatEther, type Address, zeroAddress } from 'viem';
+import { parseEther, formatEther, type Address, zeroAddress, parseUnits, parseAbi, formatUnits } from 'viem';
 import { arcPay } from './contract';
 import { calculateBalances } from './balance';
 import { fetchHistory } from './history';
 import { ACTIVE_CHAIN } from './chain';
+import { MOCK_TOKENS } from './tokens';
 
 export type ToolCall = { name: string; args: Record<string, unknown> };
 export type ToolResult =
@@ -27,28 +28,30 @@ export async function executeTool(
     switch (tc.name) {
       case 'get_balance': {
         const { usdc, walletUsdc } = await calculateBalances(account.address as Address);
-        return { ok: true, data: `USDC (Vault): ${formatEther(usdc)}, USDC (Wallet): ${formatEther(walletUsdc)}` };
+        return { ok: true, data: `USDC (Vault): ${formatUnits(usdc, 6)}, USDC (Wallet): ${formatUnits(walletUsdc, 6)}` };
       }
       case 'deposit': {
-        const amount = parseEther(String(tc.args.amount));
+        const amount = parseUnits(String(tc.args.amount), 6);
+        const usdcAddress = MOCK_TOKENS[0].address as Address;
         const hash = await walletClient.writeContract({
           address: arcPay.address as Address,
-          abi: arcPay.abi,
+          abi: parseAbi(['function deposit(address token, uint256 amount) external']),
           functionName: 'deposit',
-          value: amount,
+          args: [usdcAddress, amount],
           account: account.address as Address,
           chain: ACTIVE_CHAIN,
         });
-        return { ok: true, data: `Deposited ${tc.args.amount} USDC (Native)`, hash: hash as string };
+        return { ok: true, data: `Deposited ${tc.args.amount} USDC`, hash: hash as string };
       }
       case 'send_payment': {
-        const amount = parseEther(String(tc.args.amount));
+        const amount = parseUnits(String(tc.args.amount), 6);
         const to = String(tc.args.to) as Address;
+        const usdcAddress = MOCK_TOKENS[0].address as Address;
         const hash = await walletClient.writeContract({
           address: arcPay.address as Address,
-          abi: arcPay.abi,
+          abi: parseAbi(['function transfer(address to, address token, uint256 amount) external']),
           functionName: 'transfer',
-          args: [to, zeroAddress, amount],
+          args: [to, usdcAddress, amount],
           account: account.address as Address,
           chain: ACTIVE_CHAIN,
         });
@@ -70,7 +73,7 @@ export async function executeTool(
         const events = await fetchHistory(account.address as Address);
         return {
           ok: true,
-          data: `USDC (Vault): ${formatEther(usdc)}, USDC (Wallet): ${formatEther(walletUsdc)} · ${events.length} on-chain events.`,
+          data: `USDC (Vault): ${formatUnits(usdc, 6)}, USDC (Wallet): ${formatUnits(walletUsdc, 6)} · ${events.length} on-chain events.`,
         };
       }
       default:

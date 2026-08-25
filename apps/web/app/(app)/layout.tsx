@@ -9,6 +9,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { ChatFloater } from '@/components/ChatFloater';
 import { NetworkGate } from '@/components/NetworkGate';
 import { Particles } from '@/components/Particles';
+import { Toaster } from 'sonner';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { ready, authenticated } = usePrivy();
@@ -78,12 +79,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {drawerOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <h1 className="text-sm tracking-tight">
-              AI Pay{' '}
+              Flow{' '}
               <span
                 className="text-violet-400"
                 style={{ fontFamily: 'var(--font-display), serif', fontStyle: 'italic' }}
               >
-                Arc
+                Pay
               </span>
             </h1>
           </div>

@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, Copy, Check, RefreshCw, RotateCw, Send, ArrowDownToLine, QrCode } from 'lucide-react';
-import { formatEther } from 'viem';
+import { formatEther, formatUnits } from 'viem';
 import { calculateBalances } from '@/lib/balance';
 import { useWalletAddress } from '@/lib/useWalletAddress';
 import type { CardAction } from './CardActionModal';
@@ -63,7 +63,7 @@ export function ArcCard({
     setLoading(true);
     try {
       const bals = await calculateBalances(address);
-      const v = parseFloat(formatEther(bals.usdc));
+      const v = parseFloat(formatUnits(bals.usdc, 6));
       setBalance(v); onBalance?.(v);
     } catch { /* ignore */ } finally { setLoading(false); }
   };

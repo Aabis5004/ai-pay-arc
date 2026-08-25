@@ -2,11 +2,12 @@
 
 import {
   createWalletClient, createPublicClient, custom, http,
-  parseEther, isAddress, type Address, zeroAddress, type Chain
+  parseEther, parseUnits, parseAbi, isAddress, type Address, zeroAddress, type Chain
 } from 'viem';
 import { arcPay } from './contract';
 import { arcTestnet } from './chain';
 import { resolveCard } from './cardRegistry';
+import { MOCK_TOKENS } from './tokens';
 
 type Provider = { request: (a: { method: string; params?: unknown }) => Promise<unknown> };
 
@@ -64,10 +65,9 @@ export async function cardDeposit(
   try {
     const hash = await wc.writeContract({
       address: contract.address as Address,
-      abi: contract.abi,
+      abi: parseAbi(['function deposit(address token, uint256 amount) external']),
       functionName: 'deposit',
-      args: [],
-      value: parseEther(amount),
+      args: [MOCK_TOKENS[0].address as Address, parseUnits(amount, 6)],
       chain,
     });
     await getPublicClient(chain).waitForTransactionReceipt({ hash, timeout: 30_000 });
@@ -88,9 +88,9 @@ export async function cardSend(
   try {
     const hash = await wc.writeContract({
       address: contract.address as Address,
-      abi: contract.abi,
+      abi: parseAbi(['function transfer(address to, address token, uint256 amount) external']),
       functionName: 'transfer',
-      args: [to as Address, zeroAddress, parseEther(amount)],
+      args: [to as Address, MOCK_TOKENS[0].address as Address, parseUnits(amount, 6)],
       chain,
     });
     const receipt = await getPublicClient(chain).waitForTransactionReceipt({ hash, timeout: 30_000 });

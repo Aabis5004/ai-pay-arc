@@ -24,7 +24,7 @@ export function NetworkGate({ children }: { children: React.ReactNode }) {
             Wrong network
           </div>
           <div className="text-xs text-amber-300/70 mb-4">
-            Your wallet is on chain {chainId || 'unknown'}. AI Pay Seismic is
+            Your wallet is on chain {chainId || 'unknown'}. FlowPay is
             configured for <strong>{ACTIVE_CHAIN.name}</strong> (chain {ACTIVE_CHAIN.id}).
           </div>
           <button
