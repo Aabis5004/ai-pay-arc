@@ -187,7 +187,6 @@ export function ArcCard({
       {/* COMPACT ACTION BUTTONS under the card */}
       <div className="flex items-center justify-center gap-2 mt-6 w-full" style={{ maxWidth: 540 }}>
         <CompactBtn icon={ArrowDownToLine} label="Deposit" onClick={() => onAction?.('deposit')} />
-        <CompactBtn icon={ArrowUpRight} label="Withdraw" onClick={() => onAction?.('withdraw')} />
         <CompactBtn icon={Send} label="Send" onClick={() => onAction?.('send')} />
         <CompactBtn icon={QrCode} label="Receive" onClick={() => onAction?.('receive')} />
         <CompactBtn icon={RotateCw} label="Flip" onClick={() => setFlipped((v) => !v)} />
