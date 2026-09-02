@@ -30,15 +30,19 @@ export async function executeTool(
         const { usdc, walletUsdc } = await calculateBalances(account.address as Address);
         return { ok: true, data: `USDC (Vault): ${formatUnits(usdc, 6)}, USDC (Wallet): ${formatUnits(walletUsdc, 6)}` };
       }
-      case 'withdraw':
-        hash = await wc.writeContract({
+      case 'withdraw': {
+        const amount = parseUnits(String(tc.args.amount), 6);
+        const usdcAddress = MOCK_TOKENS[0].address as Address;
+        const hash = await walletClient.writeContract({
           address: arcPay.address as Address,
           abi: parseAbi(['function withdraw(address token, uint256 amount) external']),
           functionName: 'withdraw',
-          args: [MOCK_TOKENS[0].address as Address, parseUnits(call.args.amount, 6)],
-          chain: arcTestnet
+          args: [usdcAddress, amount],
+          account: account.address as Address,
+          chain: ACTIVE_CHAIN,
         });
-        break;
+        return { ok: true, data: `Withdrew ${tc.args.amount} USDC`, hash: hash as string };
+      }
       case 'deposit': {
         const amount = parseUnits(String(tc.args.amount), 6);
         const usdcAddress = MOCK_TOKENS[0].address as Address;
