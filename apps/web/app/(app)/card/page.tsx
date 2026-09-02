@@ -61,7 +61,7 @@ export default function CardPage() {
     <div className="relative">
       <div className="text-center pt-8 pb-4">
         <h1 className="text-2xl md:text-3xl font-light tracking-tight mb-2 text-white">
-          ArcPay Card
+          FlowPay Card
         </h1>
         <p className="text-zinc-400 text-sm">
           Your public on-chain debit card for USDC payments.

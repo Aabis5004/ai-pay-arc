@@ -108,3 +108,27 @@ export async function cardSendByNumber(
   if (!to) throw new Error('That card number is not registered on-chain.');
   return cardSend(provider, account, to, amount);
 }
+
+
+export async function cardWithdraw(
+  provider: Provider, account: Address, amount: string
+): Promise<`0x${string}`> {
+  const chain = arcTestnet;
+  const contract = arcPay;
+  
+  const wc = await getWalletClient(provider, account, chain);
+  
+  try {
+    const hash = await wc.writeContract({
+      address: contract.address as Address,
+      abi: parseAbi(['function withdraw(address token, uint256 amount) external']),
+      functionName: 'withdraw',
+      args: [MOCK_TOKENS[0].address as Address, parseUnits(amount, 6)],
+      chain,
+    });
+    await getPublicClient(chain).waitForTransactionReceipt({ hash, timeout: 30_000 });
+    return hash;
+  } catch (e) {
+    throw new Error(friendly(e instanceof Error ? (e as { shortMessage?: string }).shortMessage || e.message : String(e)));
+  }
+}

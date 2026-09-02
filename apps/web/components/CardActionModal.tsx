@@ -6,10 +6,10 @@ import { QRCodeSVG } from 'qrcode.react';
 import { X, Loader2, CheckCircle2, XCircle, Copy, Check } from 'lucide-react';
 import { useWallets } from '@privy-io/react-auth';
 import { useWalletAddress } from '@/lib/useWalletAddress';
-import { cardDeposit, cardSendByNumber } from '@/lib/cardTx';
+import { cardDeposit, cardSendByNumber, cardWithdraw } from '@/lib/cardTx';
 import type { Address } from 'viem';
 
-export type CardAction = 'send' | 'deposit' | 'receive' | null;
+export type CardAction = 'send' | 'deposit' | 'receive' | 'withdraw' | null;
 
 type Phase =
   | { s: 'form' }
@@ -58,6 +58,11 @@ export function CardActionModal({
         setPhase({ s: 'working', label: 'Depositing to card…' });
         const hash = await cardDeposit(provider as never, address as Address, amount);
         setPhase({ s: 'done', hash });
+      } else if (action === 'withdraw') {
+        if (!(parseFloat(amount) > 0)) { setPhase({ s: 'error', msg: 'Enter an amount greater than 0.' }); return; }
+        setPhase({ s: 'working', label: 'Withdrawing from card...' });
+        const hash = await cardWithdraw(provider as never, address as Address, amount);
+        setPhase({ s: 'done', hash });
       } else if (action === 'send') {
         if (!to.replace(/\D/g,'')) { setPhase({ s: 'error', msg: 'Enter a recipient card number.' }); return; }
         if (!(parseFloat(amount) > 0)) { setPhase({ s: 'error', msg: 'Enter an amount greater than 0.' }); return; }
@@ -79,6 +84,7 @@ export function CardActionModal({
   };
 
   const title = action === 'send' ? 'Send from card'
+    : action === 'withdraw' ? 'Withdraw to wallet'
     : action === 'deposit' ? 'Deposit to card'
     : action === 'receive' ? 'Receive to card' : '';
 
@@ -107,7 +113,7 @@ export function CardActionModal({
             </button>
 
             <div className="text-[10px] uppercase tracking-[0.25em] text-sky-300/70 mb-1">
-              ArcPay Card
+              FlowPay Card
             </div>
             <div className="text-xl font-light mb-1" style={{ fontFamily: 'var(--font-display), serif' }}>{title}</div>
             <div className="font-mono text-[11px] text-zinc-500 mb-6">{cardNumber}</div>
@@ -135,7 +141,7 @@ export function CardActionModal({
             )}
 
             {/* SEND / DEPOSIT FORM */}
-            {(action === 'send' || action === 'deposit') && phase.s === 'form' && (
+            {(action === 'send' || action === 'deposit' || action === 'withdraw') && phase.s === 'form' && (
               <div className="space-y-4">
                 {action === 'send' && (
                   <div>

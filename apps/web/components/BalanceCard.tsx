@@ -76,7 +76,7 @@ export function BalanceCard() {
           </div>
         </div>
 
-        {/* ArcPay USDC Balance */}
+        {/* FlowPay USDC Balance */}
         <div className="flex items-baseline justify-between pt-2 border-t border-white/5">
           <div className="flex items-baseline gap-3">
             {!address || balances === null ? (
@@ -88,7 +88,7 @@ export function BalanceCard() {
                 <NumberCounter value={balances.usdc} decimals={2} />
               </div>
             )}
-            <div className="text-xs text-white/40 font-light">USDC (ArcPay Vault)</div>
+            <div className="text-xs text-white/40 font-light">USDC (FlowPay Vault)</div>
           </div>
         </div>
       </div>

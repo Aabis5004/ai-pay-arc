@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, Copy, Check, RefreshCw, RotateCw, Send, ArrowDownToLine, QrCode } from 'lucide-react';
+import { Shield, Copy, Check, RefreshCw, RotateCw, Send, ArrowDownToLine, ArrowUpRight, QrCode } from 'lucide-react';
 import { formatEther, formatUnits } from 'viem';
 import { calculateBalances } from '@/lib/balance';
 import { useWalletAddress } from '@/lib/useWalletAddress';
@@ -112,7 +112,7 @@ export function ArcCard({
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-xl font-medium tracking-tight text-white">
-                    ArcPay
+                    FlowPay
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-800 border border-zinc-700">
@@ -187,6 +187,7 @@ export function ArcCard({
       {/* COMPACT ACTION BUTTONS under the card */}
       <div className="flex items-center justify-center gap-2 mt-6 w-full" style={{ maxWidth: 540 }}>
         <CompactBtn icon={ArrowDownToLine} label="Deposit" onClick={() => onAction?.('deposit')} />
+        <CompactBtn icon={ArrowUpRight} label="Withdraw" onClick={() => onAction?.('withdraw')} />
         <CompactBtn icon={Send} label="Send" onClick={() => onAction?.('send')} />
         <CompactBtn icon={QrCode} label="Receive" onClick={() => onAction?.('receive')} />
         <CompactBtn icon={RotateCw} label="Flip" onClick={() => setFlipped((v) => !v)} />

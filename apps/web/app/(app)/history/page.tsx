@@ -27,7 +27,7 @@ function timeAgo(ts?: number) {
 
 function truncate(addr: string | undefined, chars = 4) {
   if (!addr) return '';
-  if (addr === 'ArcPay Contract') return addr;
+  if (addr === 'FlowPay Contract') return addr;
   return `${addr.slice(0, chars + 2)}...${addr.slice(-chars)}`;
 }
 
@@ -126,11 +126,11 @@ export default function HistoryPage() {
               
               if (ev.type === 'deposit') {
                 fromAddress = address || '';
-                toAddress = 'ArcPay Contract';
+                toAddress = 'FlowPay Contract';
                 actionType = 'Deposit';
                 primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
               } else if (ev.type === 'withdraw') {
-                fromAddress = 'ArcPay Contract';
+                fromAddress = 'FlowPay Contract';
                 toAddress = address || '';
                 actionType = 'Withdraw';
                 primaryText = `${ev.amount ? parseFloat(formatEther(ev.amount)).toString() : '0'} USDC`;
@@ -196,7 +196,7 @@ export default function HistoryPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
                       <span>Sender: {truncate(fromAddress)}</span>
-                      {fromAddress !== 'ArcPay Contract' && (
+                      {fromAddress !== 'FlowPay Contract' && (
                         <button onClick={() => copy(fromAddress)} className="hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100">
                           <Copy className="w-3 h-3" />
                         </button>
@@ -211,7 +211,7 @@ export default function HistoryPage() {
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-mono">
                       <span>Recipient: {truncate(toAddress)}</span>
-                      {toAddress !== 'ArcPay Contract' && (
+                      {toAddress !== 'FlowPay Contract' && (
                         <button onClick={() => copy(toAddress)} className="hover:text-zinc-300 transition-colors opacity-0 group-hover:opacity-100">
                           <Copy className="w-3 h-3" />
                         </button>

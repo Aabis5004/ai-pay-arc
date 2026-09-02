@@ -26,7 +26,7 @@ const actionTools = [
       },
       {
         name: 'deposit',
-        description: 'Deposit native USDC into the ArcPay vault.',
+        description: 'Deposit native USDC into the FlowPay vault.',
         parameters: {
           type: Type.OBJECT,
           properties: {
@@ -48,17 +48,18 @@ const actionTools = [
   },
 ];
 
-const actionSystem = `You are Arc AI, the assistant in the "FlowPay" payments app.
+const actionSystem = `You are Flow AI, the assistant in the "FlowPay" payments app.
 If the user wants to MOVE MONEY, call the matching tool:
 - balance question → get_balance
 - "deposit X" → deposit
+- "withdraw X" → withdraw
 - "send X to 0x…" or "send X to 4242 4242…" → send_payment
 - activity/history → get_history
 - portfolio → get_portfolio
 Always use tools to process their requests, never invent numbers/hashes/addresses.
 If the user is NOT asking to move money (e.g. a question about Arc, crypto, or anything informational), do NOT call any tool — just respond with an empty message and we'll handle the answer separately.`;
 
-const answerSystem = `You are Arc AI, a friendly, knowledgeable assistant inside the "FlowPay" app.
+const answerSystem = `You are Flow AI, a friendly, knowledgeable assistant inside the "FlowPay" app.
 Answer the user's question about Arc, programmable money, crypto, or whatever they ask. Use live web search to get current, accurate info (mainnet timing, token launches, recent news, prices). 
 
 Here is the deep context about Arc that you MUST use to answer questions:
