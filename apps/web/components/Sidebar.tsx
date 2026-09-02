@@ -34,7 +34,7 @@ const nav = [
   { href: '/history', label: 'Activity', icon: Clock },
   { href: '/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/card', label: 'Card', icon: CreditCard },
-  { href: '/trading', label: 'Arc AI', icon: Sparkles },
+  { href: '/trading', label: 'Flow AI', icon: Sparkles },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 

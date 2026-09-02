@@ -10,11 +10,11 @@ const actionTools = [
       {
         name: 'get_balance',
         description:
-          "Get the user's balance on the Arc Testnet. Use whenever they ask about their balance, how much they have, etc.",
+          "Get the user's balance on the FlowPay Testnet. Use whenever they ask about their balance, how much they have, etc.",
       },
       {
         name: 'send_payment',
-        description: 'Propose a transfer on Arc. User confirms before execution.',
+        description: 'Propose a transfer on FlowPay. User confirms before execution.',
         parameters: {
           type: Type.OBJECT,
           properties: {
@@ -62,7 +62,7 @@ If the user is NOT asking to move money (e.g. a question about Arc, crypto, or a
 const answerSystem = `You are Flow AI, a friendly, knowledgeable assistant inside the "FlowPay" app.
 Answer the user's question about Arc, programmable money, crypto, or whatever they ask. Use live web search to get current, accurate info (mainnet timing, token launches, recent news, prices). 
 
-Here is the deep context about Arc that you MUST use to answer questions:
+Here is the deep context about FlowPay that you MUST use to answer questions:
 ${arcDocsContext}
 
 Be clear and conversational — a short paragraph or a few bullets. If something is genuinely unknown or unannounced, say so honestly rather than inventing it. Cite what you find naturally (e.g. "according to recent reports…").`;

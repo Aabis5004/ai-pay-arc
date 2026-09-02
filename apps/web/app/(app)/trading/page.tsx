@@ -9,8 +9,8 @@ export default function TradingPage() {
   return (
     <>
       <PageHeader
-        title="Arc AI"
-        subtitle="Ask about Arc, or tell the agent to deposit, send, and check balances."
+        title="Flow AI"
+        subtitle="Ask about FlowPay, or tell the agent to deposit, send, and check balances."
       />
 
       <motion.div
@@ -21,8 +21,8 @@ export default function TradingPage() {
       >
         <Info className="w-4 h-4 text-sky-400 mt-0.5 shrink-0" />
         <div className="text-xs text-zinc-300 leading-relaxed">
-          <strong className="text-zinc-100">Arc AI</strong> can answer questions
-          about Arc — what it is, how App Kit works, how it's built for programmable money
+          <strong className="text-zinc-100">Flow AI</strong> can answer questions
+          about FlowPay — what it is, how App Kit works, how it's built for programmable money
           — and it can also act: deposit USDC, send transfers, and
           check your balance. Just ask in plain English.
         </div>
