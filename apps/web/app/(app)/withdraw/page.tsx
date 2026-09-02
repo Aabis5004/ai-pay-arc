@@ -146,7 +146,7 @@ export default function WithdrawPage() {
                 {account && (
                   <div className="flex items-center gap-2">
                     <span>Vault: {displayVault}</span>
-                    <button onClick={() => { if (vaultBalance) setAmount(formatUnits(vaultBalance, tokenToDeposit.decimals)); }} className="text-sky-400 hover:text-sky-300 font-bold tracking-wide text-xs">MAX</button>
+                    <button onClick={() => { if (vaultBalance) setAmount(formatUnits(vaultBalance, tokenToWithdraw.decimals)); }} className="text-sky-400 hover:text-sky-300 font-bold tracking-wide text-xs">MAX</button>
                   </div>
                 )}
               </div>
