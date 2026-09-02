@@ -3,6 +3,9 @@
 
 import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/PageHeader';
+import { GlueBillCalculator } from '@/components/demos/GlueBillCalculator';
+import { NodeFlowDiagram } from '@/components/demos/NodeFlowDiagram';
+import { ComparisonTable } from '@/components/demos/ComparisonTable';
 import { Zap, Activity, Layers, Code2, Workflow, ShieldCheck, Cpu, Repeat } from 'lucide-react';
 
 export default function DocsPage() {
@@ -112,6 +115,24 @@ export default function DocsPage() {
               {'}'}
             </code></pre>
           </div>
+        </motion.div>
+
+
+        {/* Interactive Demos */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+          className="mt-16 pt-12 border-t border-zinc-800"
+        >
+          <div className="mb-8">
+            <h3 className="text-2xl font-bold text-white mb-2">Interactive Architecture Demos</h3>
+            <p className="text-zinc-400">Play with these interactive models to understand the cost and performance benefits of collapsing the stack into the chain.</p>
+          </div>
+          
+          <GlueBillCalculator />
+          <NodeFlowDiagram />
+          <ComparisonTable />
         </motion.div>
 
         {/* AI Integration */}
