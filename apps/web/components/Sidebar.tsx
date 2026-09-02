@@ -14,6 +14,7 @@ import {
   Clock,
   PieChart,
   Settings,
+  Book,
   LogOut,
   Sparkles,
   CreditCard,
@@ -35,6 +36,7 @@ const nav = [
   { href: '/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/card', label: 'Card', icon: CreditCard },
   { href: '/trading', label: 'Flow AI', icon: Sparkles },
+  { href: '/docs', label: 'Docs', icon: Book },
   { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
